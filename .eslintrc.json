@@ -17,6 +17,7 @@
     "func-names": "off",
     "no-process-exit": "off",
     "class-methods-use-this": "off",
-    "no-param-reassign": "off"
+    "no-param-reassign": "off",
+    "node/no-unpublished-require": "off"
   }
 }

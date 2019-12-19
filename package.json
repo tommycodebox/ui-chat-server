@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "test": "jest"
+    "test": "jest --watchAll",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "socket.io": "^2.3.0",
@@ -25,6 +26,7 @@
     "eslint-plugin-prettier": "^3.1.2",
     "jest": "^24.9.0",
     "nodemon": "^2.0.2",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "socket.io-client": "^2.3.0"
   }
 }
