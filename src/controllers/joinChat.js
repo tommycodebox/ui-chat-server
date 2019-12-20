@@ -3,7 +3,6 @@ const { setTimer } = require('../utils/timer');
 
 const joinChat = (user, socket, io, timeout) => {
   const users = getAllUsers(io);
-
   if (users.find(u => u.username === user.username)) {
     socket.emit(
       'username-taken',

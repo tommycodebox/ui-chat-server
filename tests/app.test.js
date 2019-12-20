@@ -11,18 +11,11 @@ describe('App', function() {
   let socket;
   let server;
 
-  beforeAll(() => {
-    server = ioServer(5000);
-    server.on('connection', sock => connector(sock, server, 2));
-    server.on('disconnect', disconnector);
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
   describe('connector()', () => {
     beforeEach(done => {
+      server = ioServer(5000);
+      server.on('connection', sock => connector(sock, server, 20000));
+      server.on('disconnect', disconnector);
       // Setup
       socket = io.connect('http://localhost:5000', {
         'reconnection delay': 0,
@@ -39,6 +32,7 @@ describe('App', function() {
 
     afterEach(done => {
       // Cleanup
+      server.close();
       if (socket.connected) {
         socket.disconnect();
       }
@@ -109,11 +103,6 @@ describe('App', function() {
             'force new connection': true
           });
           takenSocket.on('connect', () => {
-            takenSocket.emit('join-chat', {
-              id: takenSocket.id,
-              username: 'Tom'
-            });
-
             takenSocket.on('username-taken', msg => {
               const users = getAllUsers(server);
               expect(users.length).toEqual(1);
@@ -122,6 +111,10 @@ describe('App', function() {
               );
               takenSocket.disconnect();
               done();
+            });
+            takenSocket.emit('join-chat', {
+              id: takenSocket.id,
+              username: 'Tom'
             });
           });
         });

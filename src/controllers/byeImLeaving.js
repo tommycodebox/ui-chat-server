@@ -1,8 +1,8 @@
-const { timeLeft } = require('./joinChat');
+const { removeTimer } = require('../utils/timer');
 
 const byeImLeaving = socket => {
-  clearTimeout(timeLeft);
   socket.broadcast.emit('bye', socket.user);
+  removeTimer(socket);
   delete socket.user;
 };
 
