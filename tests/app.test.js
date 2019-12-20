@@ -3,6 +3,7 @@ const ioServer = require('socket.io');
 
 // Controllers
 const connector = require('../src/controllers/connector');
+const disconnector = require('../src/controllers/disconnector');
 const getAllUsers = require('../src/controllers/getAllUsers');
 
 describe('App', function() {
@@ -12,6 +13,7 @@ describe('App', function() {
   beforeAll(() => {
     server = ioServer(5000);
     server.on('connection', sock => connector(sock, server));
+    server.on('disconnect', disconnector);
   });
 
   afterAll(() => {

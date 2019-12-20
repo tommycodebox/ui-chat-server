@@ -12,8 +12,6 @@ const joinChat = (user, socket, io) => {
     socket.user = user;
     socket.emit('join-chat-success', user);
   }
-
-  // console.log(getAllUsers(io));
 };
 
 module.exports = joinChat;

@@ -7,7 +7,12 @@ const connector = (socket, io) => {
 
   socket.on('new-message', msg => newMessage(msg, socket));
 
-  socket.on('diconnect', disconnector);
+  socket.on('bye-im-leaving', () => {
+    socket.broadcast.emit('bye', socket.user);
+    delete socket.user;
+  });
+
+  socket.on('disconnect', () => disconnector(socket));
 };
 
 module.exports = connector;
