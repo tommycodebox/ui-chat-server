@@ -1,8 +1,8 @@
 const { clearTimer } = require('../utils/timer');
 
-const newMessage = (msg, socket) => {
+const newMessage = (msg, socket, timeout) => {
   if (msg.user === socket.user.username) {
-    clearTimer(socket);
+    clearTimer(socket, timeout);
   }
   socket.broadcast.emit('message', msg);
 };

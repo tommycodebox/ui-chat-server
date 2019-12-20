@@ -6,7 +6,7 @@ const byeImLeaving = require('./byeImLeaving');
 const connector = (socket, io, timeout) => {
   socket.on('join-chat', user => joinChat(user, socket, io, timeout));
 
-  socket.on('new-message', msg => newMessage(msg, socket));
+  socket.on('new-message', msg => newMessage(msg, socket, timeout));
 
   socket.on('bye-im-leaving', () => byeImLeaving(socket));
 
