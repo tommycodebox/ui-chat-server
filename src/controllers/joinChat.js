@@ -1,7 +1,7 @@
 const getAllUsers = require('./getAllUsers');
 const { setTimer } = require('../utils/timer');
 
-const joinChat = (user, socket, io) => {
+const joinChat = (user, socket, io, timeout) => {
   const users = getAllUsers(io);
 
   if (users.find(u => u.username === user.username)) {
@@ -13,7 +13,7 @@ const joinChat = (user, socket, io) => {
     socket.user = user;
     socket.emit('join-chat-success', user);
 
-    setTimer(socket);
+    setTimer(socket, timeout);
   }
 };
 

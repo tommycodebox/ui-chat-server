@@ -5,6 +5,7 @@ const ioServer = require('socket.io');
 const connector = require('../src/controllers/connector');
 const disconnector = require('../src/controllers/disconnector');
 const getAllUsers = require('../src/controllers/getAllUsers');
+const { timers } = require('../src/utils/timer');
 
 describe('App', function() {
   let socket;
@@ -12,7 +13,7 @@ describe('App', function() {
 
   beforeAll(() => {
     server = ioServer(5000);
-    server.on('connection', sock => connector(sock, server));
+    server.on('connection', sock => connector(sock, server, 2));
     server.on('disconnect', disconnector);
   });
 
@@ -119,7 +120,7 @@ describe('App', function() {
               expect(msg).toEqual(
                 'Unfortunately username Tom is already taken'
               );
-              takenSocket.close();
+              takenSocket.disconnect();
               done();
             });
           });
@@ -128,6 +129,7 @@ describe('App', function() {
     });
 
     describe('newMessage()', () => {
+      timers.length = 0;
       beforeEach(done => {
         // Setup
         socket = io.connect('http://localhost:5000', {
@@ -156,12 +158,98 @@ describe('App', function() {
           'reopen delay': 0,
           'force new connection': true
         });
-        socket.on('message', msg => {
-          expect(msg).toEqual({ user: 'Tom', text: 'Hello' });
-          done();
+        tempSocket.on('connect', () => {
+          tempSocket.on('join-chat-success', () => {
+            socket.on('message', msg => {
+              expect(msg).toEqual({ user: 'Tom', text: 'Hello' });
+              tempSocket.disconnect();
+              done();
+            });
+            tempSocket.emit('new-message', { user: 'Tom', text: 'Hello' });
+          });
+          tempSocket.emit('join-chat', { id: socket.id, username: 'First' });
+        });
+      });
+      it('should reset the timer on new message from user', done => {
+        const tempSocket = io.connect('http://localhost:5000', {
+          'reconnection delay': 0,
+          'reopen delay': 0,
+          'force new connection': true
         });
         tempSocket.on('connect', () => {
-          tempSocket.emit('new-message', { user: 'Tom', text: 'Hello' });
+          tempSocket.on('join-chat-success', () => {
+            socket.on('message', () => {
+              let timer = timers.find(t => t.user === 'Tom');
+              timer = { user: timer.user };
+              expect(timer).toEqual({ user: 'Tom' });
+              tempSocket.disconnect();
+              done();
+            });
+            tempSocket.emit('new-message', { user: 'Tom', text: 'Hello' });
+          });
+          tempSocket.emit('join-chat', {
+            id: tempSocket.id,
+            username: 'Someone'
+          });
+        });
+      });
+    });
+
+    describe('byeImLeaving()', () => {
+      beforeEach(done => {
+        // Setup
+        socket = io.connect('http://localhost:5000', {
+          'reconnection delay': 0,
+          'reopen delay': 0,
+          'force new connection': true
+        });
+        socket.on('connect', () => {
+          socket.on('join-chat-success', () => {
+            done();
+          });
+          socket.emit('join-chat', { id: socket.id, username: 'Tom' });
+        });
+        socket.on('disconnect', () => {
+          done();
+        });
+      });
+
+      afterEach(done => {
+        // Cleanup
+        if (socket.connected) {
+          socket.disconnect();
+        }
+        done();
+      });
+
+      it('should emit `bye` event to other sockets', done => {
+        const tempSocket = io.connect('http://localhost:5000', {
+          'reconnection delay': 0,
+          'reopen delay': 0,
+          'force new connection': true
+        });
+        tempSocket.on('connect', () => {
+          tempSocket.on('bye', user => {
+            expect(user).toEqual({ id: socket.id, username: 'Tom' });
+            tempSocket.disconnect();
+            done();
+          });
+          socket.emit('bye-im-leaving', 'Tom');
+        });
+      });
+      it('should remove user that left from users list', done => {
+        const tempSocket = io.connect('http://localhost:5000', {
+          'reconnection delay': 0,
+          'reopen delay': 0,
+          'force new connection': true
+        });
+        tempSocket.on('connect', () => {
+          tempSocket.on('bye', () => {
+            const users = getAllUsers(server);
+            expect(users.length).toEqual(0);
+            done();
+          });
+          socket.emit('bye-im-leaving', 'Tom');
         });
       });
     });

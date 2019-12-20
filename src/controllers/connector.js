@@ -3,8 +3,8 @@ const joinChat = require('./joinChat');
 const newMessage = require('./newMessage');
 const byeImLeaving = require('./byeImLeaving');
 
-const connector = (socket, io) => {
-  socket.on('join-chat', user => joinChat(user, socket, io));
+const connector = (socket, io, timeout) => {
+  socket.on('join-chat', user => joinChat(user, socket, io, timeout));
 
   socket.on('new-message', msg => newMessage(msg, socket));
 
