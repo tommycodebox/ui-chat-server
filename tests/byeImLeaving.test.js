@@ -5,14 +5,14 @@ const ioServer = require('socket.io');
 const connector = require('../src/controllers/connector');
 const getAllUsers = require('../src/controllers/getAllUsers');
 
-describe('joinChat()', () => {
+describe('newMessage()', () => {
   let socket;
   let server;
   beforeEach(done => {
     // Setup
-    server = ioServer(5001);
+    server = ioServer(5003);
     server.on('connection', sock => connector(sock, server, 5000));
-    socket = io.connect('http://localhost:5001', {
+    socket = io.connect('http://localhost:5003', {
       'reconnection delay': 0,
       'reopen delay': 0,
       'force new connection': true
@@ -36,35 +36,34 @@ describe('joinChat()', () => {
     done();
   });
 
-  it('should join chat with unique username', done => {
-    const tempSocket = io.connect('http://localhost:5001');
+  it('should emit `bye` event to other sockets', done => {
+    const tempSocket = io.connect('http://localhost:5003', {
+      'reconnection delay': 0,
+      'reopen delay': 0,
+      'force new connection': true
+    });
     tempSocket.on('connect', () => {
-      tempSocket.on('join-chat-success', user => {
-        const users = getAllUsers(server);
-        expect(users.find(u => u.username === user.username)).toEqual({
-          id: socket.id,
-          username: 'Tommy'
-        });
+      tempSocket.on('bye', user => {
+        expect(user).toEqual({ id: socket.id, username: 'Tom' });
         tempSocket.disconnect();
         done();
       });
-      tempSocket.emit('join-chat', { id: socket.id, username: 'Tommy' });
+      socket.emit('bye-im-leaving', 'Tom');
     });
   });
-  it('should decline joining chat with taken username', done => {
-    const tempSocket = io.connect('http://localhost:5001');
+  it('should remove user that left from users list', done => {
+    const tempSocket = io.connect('http://localhost:5003', {
+      'reconnection delay': 0,
+      'reopen delay': 0,
+      'force new connection': true
+    });
     tempSocket.on('connect', () => {
-      tempSocket.on('username-taken', msg => {
+      tempSocket.on('bye', () => {
         const users = getAllUsers(server);
-        expect(users.length).toEqual(1);
-        expect(msg).toEqual('Unfortunately username Tom is already taken');
-        tempSocket.disconnect();
+        expect(users.length).toEqual(0);
         done();
       });
-      tempSocket.emit('join-chat', {
-        id: tempSocket.id,
-        username: 'Tom'
-      });
+      socket.emit('bye-im-leaving', 'Tom');
     });
   });
 });
