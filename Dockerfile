@@ -8,6 +8,6 @@ RUN yarn
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE 80
 
-CMD [ "node", "src/app.js" ]
+CMD [ "yarn", "start" ]
