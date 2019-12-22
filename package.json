@@ -11,13 +11,15 @@
     "dev": "nodemon src/app.js",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls"
   },
   "dependencies": {
     "socket.io": "^2.3.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "coveralls": "^3.0.9",
     "eslint": "^6.1.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-node": "^4.0.0",
@@ -29,5 +31,11 @@
     "nodemon": "^2.0.2",
     "prettier": "^1.19.1",
     "socket.io-client": "^2.3.0"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!/node_modules/"
+    ]
   }
 }
