@@ -11,11 +11,7 @@ describe('connector()', () => {
     server = ioServer(5000);
     server.on('connection', sock => connector(sock, server, 5000));
     // Setup
-    socket = io.connect('http://localhost:5000', {
-      'reconnection delay': 0,
-      'reopen delay': 0,
-      'force new connection': true
-    });
+    socket = io.connect('http://localhost:5000');
     socket.on('connect', () => {
       done();
     });
@@ -39,11 +35,7 @@ describe('connector()', () => {
   });
   it('should connect more than 1 socket instance', done => {
     // Setup
-    const tempSocket = io.connect('http://localhost:5000', {
-      'reconnection delay': 0,
-      'reopen delay': 0,
-      'force new connection': true
-    });
+    const tempSocket = io.connect('http://localhost:5000');
     tempSocket.on('connect', () => {
       expect(Object.keys(server.sockets.sockets).length).toEqual(2);
 

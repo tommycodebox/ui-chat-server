@@ -12,11 +12,7 @@ describe('newMessage()', () => {
     // Setup
     server = ioServer(5003);
     server.on('connection', sock => connector(sock, server, 5000));
-    socket = io.connect('http://localhost:5003', {
-      'reconnection delay': 0,
-      'reopen delay': 0,
-      'force new connection': true
-    });
+    socket = io.connect('http://localhost:5003');
     socket.on('connect', () => {
       socket.on('join-chat-success', () => {
         done();
@@ -37,11 +33,7 @@ describe('newMessage()', () => {
   });
 
   it('should emit `bye` event to other sockets', done => {
-    const tempSocket = io.connect('http://localhost:5003', {
-      'reconnection delay': 0,
-      'reopen delay': 0,
-      'force new connection': true
-    });
+    const tempSocket = io.connect('http://localhost:5003');
     tempSocket.on('connect', () => {
       tempSocket.on('bye', user => {
         expect(user).toEqual({ id: socket.id, username: 'Tom' });
@@ -52,11 +44,7 @@ describe('newMessage()', () => {
     });
   });
   it('should remove user that left from users list', done => {
-    const tempSocket = io.connect('http://localhost:5003', {
-      'reconnection delay': 0,
-      'reopen delay': 0,
-      'force new connection': true
-    });
+    const tempSocket = io.connect('http://localhost:5003');
     tempSocket.on('connect', () => {
       tempSocket.on('bye', () => {
         const users = getAllUsers(server);

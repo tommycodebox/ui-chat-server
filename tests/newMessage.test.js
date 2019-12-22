@@ -12,11 +12,7 @@ describe('newMessage()', () => {
     // Setup
     server = ioServer(5002);
     server.on('connection', sock => connector(sock, server, 5000));
-    socket = io.connect('http://localhost:5002', {
-      'reconnection delay': 0,
-      'reopen delay': 0,
-      'force new connection': true
-    });
+    socket = io.connect('http://localhost:5002');
     socket.on('connect', () => {
       socket.on('join-chat-success', () => {
         done();
@@ -37,11 +33,7 @@ describe('newMessage()', () => {
   });
 
   it('should accept and redirect new message to all connected sockets', done => {
-    const tempSocket = io.connect('http://localhost:5002', {
-      'reconnection delay': 0,
-      'reopen delay': 0,
-      'force new connection': true
-    });
+    const tempSocket = io.connect('http://localhost:5002');
     tempSocket.on('connect', () => {
       tempSocket.on('join-chat-success', () => {
         socket.on('message', msg => {
@@ -55,11 +47,7 @@ describe('newMessage()', () => {
     });
   });
   it('should reset the timer on new message from user', done => {
-    const tempSocket = io.connect('http://localhost:5002', {
-      'reconnection delay': 0,
-      'reopen delay': 0,
-      'force new connection': true
-    });
+    const tempSocket = io.connect('http://localhost:5002');
     tempSocket.on('connect', () => {
       tempSocket.on('join-chat-success', () => {
         socket.on('message', () => {

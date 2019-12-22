@@ -12,11 +12,7 @@ describe('joinChat()', () => {
     // Setup
     server = ioServer(5001);
     server.on('connection', sock => connector(sock, server, 5000));
-    socket = io.connect('http://localhost:5001', {
-      'reconnection delay': 0,
-      'reopen delay': 0,
-      'force new connection': true
-    });
+    socket = io.connect('http://localhost:5001');
     socket.on('connect', () => {
       socket.on('join-chat-success', () => {
         done();
