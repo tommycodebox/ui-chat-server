@@ -63,4 +63,18 @@ describe('joinChat()', () => {
       });
     });
   });
+  it('should reject joining chat and return error if passed invalid username', done => {
+    const tempSocket = io.connect('http://localhost:5001');
+    tempSocket.on('connect', () => {
+      tempSocket.on('validation-error', error => {
+        expect(error).toEqual('Username must contain only letters and numbers');
+        tempSocket.disconnect();
+        done();
+      });
+      tempSocket.emit('join-chat', {
+        id: tempSocket.id,
+        username: '$^#@TOM()#%'
+      });
+    });
+  });
 });
