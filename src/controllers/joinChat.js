@@ -16,6 +16,7 @@ const joinChat = (user, socket, io, timeout) => {
   } else {
     socket.user = user;
     socket.emit('join-chat-success', user);
+    socket.broadcast.emit('hello-there', user);
     /* istanbul ignore next */
     logger.info(
       `${socket.id} successfully joined chat chat with username - ${user.username}`
